@@ -1,0 +1,63 @@
+<html>
+
+<head>
+<title>Post</title>
+</head>
+
+<body>
+    <h1>add a post</h1>
+    <form id="postForm">
+        <label for="postContent">Post Content:</label>
+        <textarea id="postContent" name="postContent" rows="4" cols="50"></textarea>
+        <button type="button" onclick="addPost()">Add Post</button>
+    </form>
+
+    <script>
+
+        function addPost() {
+
+            var postContent = document.getElementById("postContent").value;
+
+            var authToken = sessionStorage.getItem("authToken");
+
+
+            if (!authToken) {
+                alert("Authentication token is missing. Please log in.");
+                return;
+            }
+
+            var apiUrl = "http://localhost:8080/api/user/post";
+
+            var headers = new Headers();
+            headers.append("Content-Type", "application/json");
+            headers.append("Authorization", authToken);
+
+            var requestBody = {
+                content: postContent,
+                caption: postContent
+            };
+
+            var requestOptions = {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(requestBody)
+            };
+
+            fetch(apiUrl, requestOptions)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to add post.");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Post added successfully:", data);
+                })
+                .catch(error => {
+                    console.error("Failed to add post:", error);
+                });
+        }
+    </script>
+</body>
+
+</html>

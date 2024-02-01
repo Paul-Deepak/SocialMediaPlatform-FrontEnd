@@ -43,7 +43,7 @@
                             onkeydown="classRemoverPass()"> <br><span id="passerror" class="error"></span> <br>
                         <span id="info" onclick="removeinfo()">i</span>&nbsp;
                         <span id="passwordcriteria">Your password must be atleast 6 characters long and must contain 1
-                            capital letter,1 special character in it.</span>
+                            capital letter, 1 special character in it.</span>
                         <br>
                         <br>
                         <input type="checkbox" name="chkbox">
@@ -76,7 +76,6 @@
         function inputPass(event) {
             passwordValue = event.target.value;
         }
-
 
         function login(event) {
             event.preventDefault()
@@ -133,7 +132,7 @@
                             throw new Error('Invalid credentials');
                         }
                         const authorizationHeader = response.headers.get('Authorization');
-                        sessionStorage.setItem("authToken", "yourTokenValue");
+                        sessionStorage.setItem("authToken", authorizationHeader);
                         console.log('JWT Token:', authorizationHeader);
 
                         return response.json();
@@ -188,31 +187,17 @@
         //         }
         //     }
         // }
+
         function signup() {
             let b = document.getElementById("signupbtn")
             if (b.innerHTML == "SIGN UP") {
-                newUser()
+                window.location.href = 'register.html';
             }
             else if (b.innerHTML == "LOG IN") {
-                back();
+                window.location.href = 'login.html';
             }
         }
-        function newUser() {
-            const subheader = document.getElementById('subheader');
-            subheader.textContent = "REGISTRATION FORM"
-            document.getElementById("alertbox2").style.display = "none"
-            document.getElementById("submitbtn").innerHTML = "REGISTER"
-            document.getElementById("signupbtn").innerHTML = "LOG IN"
-            passwordInput.value = ''
-        }
 
-        function back() {
-            let submitbutton = document.getElementById("submitbtn")
-            let subheader = document.getElementById('subheader');
-            subheader.textContent = "Enter the details you entered while registering"
-            document.getElementById("submitbtn").innerHTML = "SUBMIT"
-            document.getElementById("signupbtn").innerHTML = "SIGN UP"
-        }
 
         function showAlert(textmsg, status) {
             const alertbox = document.getElementById("alertbox")

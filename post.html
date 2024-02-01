@@ -1,14 +1,18 @@
 <html>
 
 <head>
-<title>Post</title>
+    <title>Post</title>
 </head>
 
 <body>
-    <h1>add a post</h1>
+    <h1>Add A New Post</h1>
     <form id="postForm">
         <label for="postContent">Post Content:</label>
         <textarea id="postContent" name="postContent" rows="4" cols="50"></textarea>
+        <br><br><br>
+        <label for="postCaption">Post Caption:</label>
+        <textarea id="postCaption" name="postCaption" rows="4" cols="50"></textarea>
+
         <button type="button" onclick="addPost()">Add Post</button>
     </form>
 
@@ -18,8 +22,7 @@
 
             var postContent = document.getElementById("postContent").value;
 
-            var authToken = sessionStorage.getItem("authToken");
-
+            let authToken = 'Bearer ' + sessionStorage.getItem("authToken");
 
             if (!authToken) {
                 alert("Authentication token is missing. Please log in.");
@@ -28,10 +31,7 @@
 
             var apiUrl = "http://localhost:8080/api/user/post";
 
-            var headers = new Headers();
-            headers.append("Content-Type", "application/json");
-            headers.append("Authorization", authToken);
-
+            console.log(authToken)
             var requestBody = {
                 content: postContent,
                 caption: postContent
@@ -39,10 +39,14 @@
 
             var requestOptions = {
                 method: "POST",
-                headers: headers,
+                headers: {
+                    'Authorization': authToken,
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify(requestBody)
             };
 
+            console.log(requestOptions)
             fetch(apiUrl, requestOptions)
                 .then(response => {
                     if (!response.ok) {

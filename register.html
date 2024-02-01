@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="login.css">
+    <!-- <script src="redirect.js"></script> -->
+    <title>Login Page</title>
+</head>
+
+<body>
+    <div id="alertbox" class="alert-box">
+        <button class="closebtn" id="closebtn" onclick="closealert()">X</button>
+        <br>
+        <span id="alert-text"></span>
+    </div>
+    <div id="alertbox2" class="alert-box">
+        <button class="closebtn" id="closebtn1" onclick="closealert1()">X</button>
+        <br>
+        <span id="alert-text">Do you want to register as new user?</span>
+        <div class="buttons">
+            <button id="Yesbtn" onclick="newUser()">Yes</button><button id="Nobtn" onclick="cancelUser()">No</button>
+        </div>
+    </div>
+    <div class="container">
+        <div class="leftcontainer">
+            <img src="image.png" alt="sampleimg">
+        </div>
+        <div class="rightcontainer">
+            <form action="register.html" method="post" id="registration-form">
+                <h2> Hey, hello &#9995; </h2>
+                <p id="subheader"> Provide your information to Register </p>
+                <div class="mail">
+                    <div class="register-side">
+                        <label for="username"><b>Username</b></label><br>
+                        <input type="text" name="username" class="textbox" id="uname"><br>
+                        
+                        <label for="profilepic"><b>Profile Pic</b></label><br>
+                        <input type="file" name="profilepic" class="textbox" id="profile-pic" /><br>
+
+                        <label for="bio"><b>Add a Bio(Below 150 characters)</b></label><br>
+                        <textarea name="bio" class="textbox" id="bio"></textarea><br>
+                  
+
+                        <label for="email"><b>Email</b></label><br>
+                        <input type="email" name="email" class="textbox" id="mailid" oninput="inputEmail(event)"
+                            onkeydown="classRemoverEmail()"><br>
+                        <span id="mailerror" class="error"></span><br>
+                        <label for="psw"><b>Password</b></label><br>
+                        <input type="password" name="psw" class="textbox" id="pwd" oninput="inputPass(event)"
+                            onkeydown="classRemoverPass()"> <br><span id="passerror" class="error"></span> <br>
+                        <span id="info" onclick="removeinfo()">i</span>&nbsp;
+                        <span id="passwordcriteria">Your password must be atleast 6 characters long and must contain 1
+                            capital letter, 1 special character in it.</span>
+
+                        <button type="submit" class="button1" id="submitbtn" onclick="registerNew(event)">SUBMIT</button><br>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script>
+
+        let emailInput = document.getElementById("mailid");
+        let passwordInput = document.getElementById("pwd");
+        let profileValue = document.getElementById("profile-pic").innerHTML;
+        let bioValue = document.getElementById("bio").innerHTML;
+        let unameInput = document.getElementById("uname");
+        let unameValue = unameInput.value;
+        let emailValue = "";
+        let passwordValue = "";
+        let emailError = document.getElementById("mailerror");
+        let passwordError = document.getElementById("passerror")
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const passRegex = /^(?=.*[A-Z])(?=.*[!@#$%^&*()_+{}]).{6,}$/;
+
+        function inputEmail(event) {
+            emailValue = event.target.value;
+        }
+
+        function inputPass(event) {
+            passwordValue = event.target.value;
+        }
+
+        function registerNew(event) {
+            event.preventDefault(event)
+
+            let requestBody = {
+                userName: unameValue,
+                profilePic: profileValue,
+                bio: bioValue,
+                email: emailValue,
+                password: passwordValue
+            };
+            console.log(requestBody);
+            if (passRegex.test(passwordValue) && emailRegex.test(emailValue)) {
+                fetch('http://localhost:8080/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+
+                    },
+                    body: JSON.stringify(requestBody),
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Registration successful:', data);
+                        // window.location.href = 'login.html';
+                    })
+                    .catch(error => {
+                        console.error('Registration failed:', error);
+                        showAlert("Registration failed. Try again", "no")
+                    });
+            }
+            else if (passwordValue == "" && emailValue == "") {
+                emailInput.classList.add('invalid');
+                emailError.textContent = 'Email should not be empty';
+                passwordInput.classList.add('invalid');
+                passwordError.textContent = 'Password should not be empty';
+            }
+            else if (!passRegex.test(passwordValue) && !emailRegex.test(emailValue)) {
+                emailInput.classList.add('invalid');
+                emailError.textContent = 'Email does not meet criteria';
+                passwordInput.classList.add('invalid');
+                passwordError.textContent = 'Password does not meet the criteria';
+            }
+            else if (!passRegex.test(passwordValue)) {
+                passwordInput.classList.add('invalid');
+                passwordError.textContent = 'Password does not meet the criteria';
+            }
+            else if (!emailRegex.test(emailValue)) {
+                emailInput.classList.add('invalid');
+                emailError.textContent = 'Email should not be empty';
+            }
+        }
+        
+        function showAlert(textmsg, status) {
+            const alertbox = document.getElementById("alertbox")
+            const alertmsg = document.getElementById("alert-text")
+            alertmsg.textContent = textmsg;
+            if (status == "yes") {
+                alertbox.classList.remove("fail")
+                alertbox.classList.add("pass")
+            }
+            else if (status == "no") {
+                alertbox.classList.remove("pass")
+                alertbox.classList.add("fail")
+            }
+            alertbox.style.display = "block";
+        }
+
+        function removeinfo() {
+            let a = document.getElementById("passwordcriteria")
+            if (a.style.visibility == "hidden") {
+                a.style.visibility = "visible"
+            }
+            else {
+                a.style.visibility = "hidden"
+            }
+        }
+
+        function showAlertNew(textmsg) {
+            const alertbox = document.getElementById("alertbox2")
+            const alertmsg = document.getElementById("alert-text")
+            alertmsg.textContent = textmsg;
+            alertbox.classList.remove("pass")
+            alertbox.classList.add("fail")
+            alertbox.style.display = "block";
+        }
+
+        function closealert() {
+            document.getElementById("alertbox").style.display = "none";
+        }
+
+        function closealert1() {
+            document.getElementById("alertbox2").style.display = "none";
+        }
+
+        function classRemoverEmail() {
+            emailInput.classList.remove('invalid');
+            emailError.textContent = ''
+        }
+
+        function classRemoverPass() {
+            passwordInput.classList.remove('invalid');
+            passwordError.textContent = ''
+        }
+        function cancelUser() {
+            let alertbox = document.getElementById("alertbox2");
+            alertbox.style.display = "none";
+        }
+    </script>
+    </body>
+    </html>
